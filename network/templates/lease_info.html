@@ -1,0 +1,20 @@
+<h1>DHCP Lease Records</h1>
+
+<table border="1">
+  <tr>
+    <th>MAC Address</th>
+    <th>DHCP Version</th>
+    <th>Assigned IP</th>
+    <th>Lease Time</th>
+    <th>Timestamp</th>
+  </tr>
+  {% for lease in leases %}
+  <tr>
+    <td>{{ lease.mac_address }}</td>
+    <td>{{ lease.dhcp_version }}</td>
+    <td>{{ lease.assigned_ip }}</td>
+    <td>{{ lease.lease_time }}</td>
+    <td>{{ lease.timestamp }}</td>
+  </tr>
+  {% endfor %}
+</table>

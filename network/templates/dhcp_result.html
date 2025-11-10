@@ -1,0 +1,16 @@
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Assign IP</button>
+  <br><br>
+  <a href="/leases/">🔍 DHCP leases Saved</a>
+</form>
+
+{% if lease_info %}
+  <h3>Lease Result:</h3>
+  <p><strong>MAC Address:</strong> {{ lease_info.mac_address }}</p>
+  <p><strong>Assigned IP:</strong> {{ lease_info.assigned_ip }}</p>
+  <p><strong>DHCP Version:</strong> {{ lease_info.dhcp_version }}</p>
+  <p><strong>Lease Time:</strong> {{ lease_info.lease_time }}</p>
+  <p><strong>Lease Start:</strong> {{ lease_info.lease_start }}</p>
+{% endif %}
