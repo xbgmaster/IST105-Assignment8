@@ -25,6 +25,7 @@ def dhcp_view(request):
                     "mac_address": mac,
                     "assigned_ip": ip,
                     "dhcp_version": version,
+                    "bitwise": mac_sum_even_or_odd(mac),
                     "lease_time": "3600 seconds",
                     "lease_start": datetime.utcnow().isoformat(),
                 }
@@ -33,6 +34,7 @@ def dhcp_view(request):
                             mac_address=mac,
                             assigned_ip=ip,
                             dhcp_version=version,
+                            bitwise=mac_sum_even_or_odd(mac),
                             lease_time="3600 seconds",
                             lease_start=datetime.utcnow().isoformat()
                         )   
@@ -69,7 +71,9 @@ def assign_ipv6(mac):
     LEASES[mac] = {'ip': ipv6, 'timestamp': time.time(), 'version': 'DHCPv6'}
     return ipv6
 
-
+def mac_sum_even_or_odd(mac):
+    total = sum(int(b, 16) for b in mac.split(":"))
+    return "even" if total & 1 == 0 else "odd"
 
 def list_leases(request):
     sets = NumberSet.objects.all().order_by('-created_at')
@@ -82,6 +86,8 @@ def list_leases(request):
         assigned_ipv6: {s.assigned_ip}
         <br>
         dhcp_version: {s.dhcp_version}
+        <br>
+        bitwise: {s.bitwise}
         <br>
         lease_time: {s.lease_time}
         <br>
