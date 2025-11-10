@@ -49,18 +49,24 @@ def validate_dhcp_version(version):
     return version in ['DHCPv4', 'DHCPv6']
 
 def assign_ipv4(mac):
-    if mac in LEASES and time.time() - LEASES[mac]['timestamp'] < LEASE_TIME:
-        return LEASES[mac]['ip']
+    entry = LEASES.get(mac)
+    # Reuse existing lease only if it's still valid and was issued for DHCPv4
+    if entry and time.time() - entry['timestamp'] < LEASE_TIME and entry.get('version') == 'DHCPv4':
+        return entry['ip']
     ip = f"192.168.1.{random.randint(2, 254)}"
-    LEASES[mac] = {'ip': ip, 'timestamp': time.time()}
+    LEASES[mac] = {'ip': ip, 'timestamp': time.time(), 'version': 'DHCPv4'}
     return ip
 
 def assign_ipv6(mac):
+    entry = LEASES.get(mac)
+    # Reuse existing lease only if it's still valid and was issued for DHCPv6
+    if entry and time.time() - entry['timestamp'] < LEASE_TIME and entry.get('version') == 'DHCPv6':
+        return entry['ip']
     mac_bytes = [int(b, 16) for b in mac.split(":")]
     mac_bytes[0] ^= 0b00000010 
     eui64 = mac_bytes[:3] + [0xFF, 0xFE] + mac_bytes[3:]
     ipv6 = "2001:db8::" + ''.join(f"{b:02x}" for b in eui64[:2]) + ":" + ''.join(f"{b:02x}" for b in eui64[2:4]) + ":" + ''.join(f"{b:02x}" for b in eui64[4:6]) + ":" + ''.join(f"{b:02x}" for b in eui64[6:])
-    LEASES[mac] = {'ip': ipv6, 'timestamp': time.time()}
+    LEASES[mac] = {'ip': ipv6, 'timestamp': time.time(), 'version': 'DHCPv6'}
     return ipv6
 
 
